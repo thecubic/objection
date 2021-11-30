@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+
+import click
+import objection
+
+
+@click.command()
+@click.option("--passwordin", required=True, help="The settings file input password")
+@click.option("--passwordout", required=True, help="The settings file output password")
+@click.argument("prefsin", type=click.File("rb"))
+@click.argument("prefsout", type=click.File("wb"))
+def objection_pwchg(
+    passwordin: str, passwordout: str, prefsin: click.File, prefsout: click.File
+):
+    """Change the password of an AndroidAPS preferences file\n\n
+    PREFSIN: The settings file input\n
+    PREFSOUT: The settings file output"""
+    outer_json, preferences, iv_sz, iv = objection.deserialize_settings(
+        prefsin.read(), passwordin
+    )
+    objection.pass_objectives(preferences)
+    prefsout.write(
+        objection.serialize_settings(outer_json, preferences, iv_sz, iv, passwordout)
+    )
+
+
+if __name__ == "__main__":
+    objection_pwchg()

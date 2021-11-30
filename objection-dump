@@ -1,0 +1,18 @@
+#!/usr/bin/env python3
+
+import click
+import objection
+
+
+@click.command()
+@click.option("--password", required=True, help="The settings file password")
+@click.argument("prefs", type=click.File("rb"))
+def objection_dump(password: str, prefs: click.File):
+    """Dump the objectives from an AndroidAPS preferences file to terminal\n\n
+    PREFS: The settings file"""
+    _, preferences, _, _ = objection.deserialize_settings(prefs.read(), password)
+    objection.dump_objectives(preferences)
+
+
+if __name__ == "__main__":
+    objection_dump()
